@@ -6,7 +6,7 @@ RUN apk add gcc build-base musl-dev python3-dev libffi-dev openssl-dev libpq-dev
 
 RUN python -m pip install --upgrade --no-cache-dir pip
 
-COPY ./src/requirements.txt /app/src/
+COPY ./requirements.txt /app/src/
 
 RUN python -m pip install --no-cache-dir -r ./src/requirements.txt
 
