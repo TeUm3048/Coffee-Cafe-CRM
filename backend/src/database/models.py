@@ -1,15 +1,16 @@
-import os
-from sqlalchemy import Column, String, Integer
-from flask_sqlalchemy import SQLAlchemy
 import json
+import os
 
-# database_filename = "database.db"
-# project_dir = os.path.dirname(os.path.abspath(__file__))
-# database_path = "sqlite:///{}".format(os.path.join(project_dir, database_filename))
+from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, Integer, String
 
-
+load_dotenv()
 database_name = 'drinks_db'
-database_path = 'postgres://{}@{}/{}'.format('shehryarbajwa', 'localhost:5432', database_name)
+database_path = os.getenv('DATABASE_URL')
+
+if not database_path:
+    raise ValueError("DATABASE_URL environment variable is not set")
 
 db = SQLAlchemy()
 
