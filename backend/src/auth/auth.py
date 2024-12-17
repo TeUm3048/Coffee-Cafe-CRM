@@ -5,7 +5,7 @@ from urllib.request import urlopen
 from flask import _request_ctx_stack, request
 from jose import jwt
 
-AUTH0_DOMAIN = 'coffee-fsnd.auth0.com'
+AUTH0_DOMAIN = 'dev-1qo7yrlrp7hrbc7u.us.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'coffee'
 

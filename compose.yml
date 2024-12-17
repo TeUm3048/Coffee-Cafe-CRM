@@ -12,11 +12,14 @@ services:
         condition: service_healthy
 
   frontend-with-nginx:
-     build: frontend
-     ports:
-       - 80:80
-     depends_on:
-       - backend
+    build: 
+      context: frontend
+      args:
+        EXTERNAL_BACKEND_API_URL: ${EXTERNAL_BACKEND_API_URL}
+    ports:
+      - 80:80
+    depends_on:
+      - backend
 
   db:
     image: postgres:13
