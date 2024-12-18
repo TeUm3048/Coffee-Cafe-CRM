@@ -15,7 +15,9 @@ COPY ./src/ /app/src
 WORKDIR /app
 
 ENV FLASK_APP=/app/src/app.py
+ENV PYTHONPATH=/app/src
 
-EXPOSE 5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "src.app:app"]
+EXPOSE 8080
+
+CMD ["sh", "-c", "python src/manage.py db init || echo 'Migrations already initialized'&& python src/manage.py db migrate && python src/manage.py db upgrade  && gunicorn --bind 0.0.0.0:8080 src.app:app"]

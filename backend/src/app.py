@@ -1,15 +1,17 @@
-import os
-from flask import Flask, request, jsonify, abort
-from sqlalchemy import exc
 import json
-from flask_cors import CORS
+import os
 
-from .database.models import db_drop_and_create_all, setup_db, Drink
-from .auth.auth import AuthError, requires_auth
+from flask import Flask, abort, jsonify, request
+from flask_cors import CORS
+from sqlalchemy import exc
+from flask_migrate import Migrate
+from auth.auth import AuthError, requires_auth
+from database.models import Drink, db, db_drop_and_create_all, setup_db
 
 app = Flask(__name__)
 setup_db(app)
 CORS(app)
+
 
 @app.after_request
 def after_request(response):
@@ -19,7 +21,8 @@ def after_request(response):
     header['Access-Control-Allow-Methods'] = 'POST,GET,PUT,DELETE,PATCH,OPTIONS'
     return response
 
-#db_drop_and_create_all()
+
+# db_drop_and_create_all()
 
 ## ROUTES
 
@@ -32,15 +35,16 @@ def get_drinks():
     }
     return jsonify(result)
 
+
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
 def get_drinks_details(token):
-        drinks = list(map(Drink.long, Drink.query.all()))
-        result = {
-            'success': True,
-            'drinks': drinks
-        }
-        return jsonify(result)
+    drinks = list(map(Drink.long, Drink.query.all()))
+    result = {
+        'success': True,
+        'drinks': drinks
+    }
+    return jsonify(result)
 
 
 @app.route('/drinks', methods=['POST'])
@@ -62,6 +66,7 @@ def add_drink(token):
     else:
         abort(422)
 
+
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def patch_drink(token, drink_id):
@@ -76,7 +81,7 @@ def patch_drink(token, drink_id):
 
         if title is None:
             abort(400)
-        
+
         if title is not None:
             drink.title = title
 
@@ -111,16 +116,16 @@ def delete_drinks(token, drink_id):
         abort(422)
 
 
-
 ## Error Handling
 
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
-                    "success": False, 
-                    "error": 422,
-                    "message": "unprocessable"
-                    }), 422
+        "success": False,
+        "error": 422,
+        "message": "unprocessable"
+    }), 422
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -128,8 +133,9 @@ def not_found(error):
         "success": False,
         "error": 404,
         "message": "resource not found"
-    
+
     }), 404
+
 
 @app.errorhandler(401)
 def unauthorized(error):
@@ -137,7 +143,8 @@ def unauthorized(error):
         'success': False,
         'error': 401,
         'message': 'unauthorized'
-    } , 401)
+    }, 401)
+
 
 @app.errorhandler(405)
 def method_not_allowed(error):
@@ -147,6 +154,7 @@ def method_not_allowed(error):
         'message': 'method not allowed'
     }, 405)
 
+
 @app.errorhandler(500)
 def internal_server_error(error):
     return jsonify({
@@ -155,5 +163,7 @@ def internal_server_error(error):
         'message': 'Internal Server Error'
     }, 500)
 
+
 if __name__ == '__main__':
+    migrate = Migrate(app, db)
     app.run(port=8080, debug=True)
