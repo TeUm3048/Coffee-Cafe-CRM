@@ -6,16 +6,18 @@ RUN apk add gcc build-base musl-dev python3-dev libffi-dev openssl-dev libpq-dev
 
 RUN python -m pip install --upgrade --no-cache-dir pip
 
-COPY ./requirements.txt /app/src/
+COPY ./requirements.txt /app/
 
-RUN python -m pip install --no-cache-dir -r ./src/requirements.txt
+RUN python -m pip install --no-cache-dir -r ./requirements.txt
 
-COPY ./src/ /app/src
+COPY . /app
 
 WORKDIR /app
 
 ENV FLASK_APP=/app/src/app.py
+ENV PYTHONPATH=/app/src
 
-EXPOSE 5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "src.app:app"]
+EXPOSE 8080
+
+CMD [ "sh", "entrypoint.sh" ]
